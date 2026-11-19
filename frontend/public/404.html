@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Apex Care - Redirecting...</title>
+    <script>
+      (function() {
+        var path = window.location.pathname;
+        var search = window.location.search || '';
+        var repoName = '/Smart-Hospital-Management-and-Patient-Care-System';
+        
+        var relativePath = path;
+        if (relativePath.startsWith(repoName)) {
+          relativePath = relativePath.slice(repoName.length);
+        }
+        
+        if (!relativePath.startsWith('/')) {
+          relativePath = '/' + relativePath;
+        }
+
+        var destination = repoName + '/#' + relativePath + search;
+        window.location.replace(destination);
+      })();
+    </script>
+  </head>
+  <body style="font-family: sans-serif; text-align: center; padding: 50px; background-color: #f8fafc; color: #334155;">
+    <h2>Redirecting to Apex Care Hospital Portal...</h2>
+    <p>Please wait while your session loads.</p>
+  </body>
+</html>
