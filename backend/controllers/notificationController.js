@@ -1,0 +1,52 @@
+const Notification = require('../models/Notification');
+
+// @desc Get current user notifications
+// @route GET /api/notifications
+const getMyNotifications = async (req, res, next) => {
+  try {
+    const notifications = await Notification.find({ recipient: req.user._id })
+      .sort({ createdAt: -1 })
+      .limit(30);
+
+    const unreadCount = await Notification.countDocuments({
+      recipient: req.user._id,
+      isRead: false,
+    });
+
+    res.json({ success: true, count: notifications.length, unreadCount, notifications });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc Mark single notification as read
+// @route PATCH /api/notifications/:id/read
+const markAsRead = async (req, res, next) => {
+  try {
+    const notification = await Notification.findOneAndUpdate(
+      { _id: req.params.id, recipient: req.user._id },
+      { isRead: true },
+      { new: true }
+    );
+    res.json({ success: true, notification });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc Mark all notifications as read
+// @route PATCH /api/notifications/read-all
+const markAllAsRead = async (req, res, next) => {
+  try {
+    await Notification.updateMany({ recipient: req.user._id, isRead: false }, { isRead: true });
+    res.json({ success: true, message: 'All notifications marked as read' });
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = {
+  getMyNotifications,
+  markAsRead,
+  markAllAsRead,
+};

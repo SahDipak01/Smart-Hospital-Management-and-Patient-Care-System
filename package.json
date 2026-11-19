@@ -1,0 +1,25 @@
+{
+  "name": "smart-hospital-management-system",
+  "version": "1.0.0",
+  "description": "Full-Stack Smart Hospital Management and Patient Care System (MERN)",
+  "private": true,
+  "scripts": {
+    "start:backend": "npm run start --prefix backend",
+    "dev:backend": "npm run dev --prefix backend",
+    "dev:frontend": "npm run dev --prefix frontend",
+    "build:frontend": "npm run build --prefix frontend",
+    "test:backend": "npm run test --prefix backend",
+    "test:all": "npm run test:all --prefix backend"
+  },
+  "keywords": [
+    "hospital-management",
+    "mern",
+    "emr",
+    "react",
+    "nodejs",
+    "mongodb",
+    "healthcare"
+  ],
+  "author": "Apex Care Systems",
+  "license": "ISC"
+}
