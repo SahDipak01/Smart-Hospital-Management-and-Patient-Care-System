@@ -18,7 +18,8 @@ export const handleMockRequest = async (config) => {
   // 1. Authentication Endpoints
   if (url === '/auth/login' && method === 'post') {
     const { email, password } = data;
-    const user = store.users.find((u) => u.email.toLowerCase() === (email || '').toLowerCase().trim());
+    const cleanEmail = (email || '').toLowerCase().trim();
+    const user = store.users.find((u) => u.email.toLowerCase() === cleanEmail);
 
     if (!user) {
       const err = new Error('Invalid email or password');
@@ -192,36 +193,79 @@ export const handleMockRequest = async (config) => {
 
   // 3. Dashboards & Analytics
   if (url.startsWith('/analytics/dashboard') && method === 'get') {
+    const totalPatients = store.patients.length + 124;
+    const totalDoctors = store.doctors.length + 16;
+    const totalStaff = 48;
+    const totalBeds = 88;
+    const occupiedBeds = 66;
+    const availableBeds = 18;
+    const maintenanceBeds = 4;
+
     return {
       status: 200,
       data: {
         success: true,
-        stats: {
-          totalPatients: store.patients.length + 120,
-          totalDoctors: store.doctors.length + 16,
-          totalStaff: 48,
-          bedOccupancyRate: 76.5,
-          appointmentsToday: store.appointments.length + 14,
-          monthlyRevenue: 154200,
-          pendingApprovals: store.approvals.filter((a) => a.approvalStatus === 'Pending').length,
-          activeWardsCount: store.wards.length,
+        selectedRange: 'all',
+        kpis: {
+          totalPatients,
+          totalDoctors,
+          totalStaff,
+          todayAppointments: {
+            total: 16,
+            completed: 10,
+            pending: 5,
+            cancelled: 1,
+          },
+          bedMetrics: {
+            total: totalBeds,
+            occupied: occupiedBeds,
+            available: availableBeds,
+            maintenance: maintenanceBeds,
+            occupancyPercent: Math.round((occupiedBeds / totalBeds) * 100),
+          },
+          financials: {
+            totalRevenue: 154200,
+            totalCollected: 142000,
+            outstandingBalance: 12200,
+          },
+          alerts: {
+            lowStockMedicinesCount: store.inventory.filter((i) => i.status === 'Low Stock').length,
+            lowStockMedicines: store.inventory.filter((i) => i.status === 'Low Stock'),
+            pendingLabOrdersCount: store.labOrders.filter((l) => l.status !== 'Completed').length,
+            activeInpatientsCount: occupiedBeds,
+          },
         },
-        revenueBreakdown: [
-          { name: 'Cardiology', value: 48500 },
-          { name: 'Neurology', value: 36200 },
-          { name: 'Orthopedics', value: 29400 },
-          { name: 'General Medicine', value: 22100 },
-          { name: 'Emergency', value: 18000 },
-        ],
-        monthlyTrends: [
-          { month: 'Jun', patients: 320, revenue: 112000 },
-          { month: 'Jul', patients: 380, revenue: 128000 },
-          { month: 'Aug', patients: 410, revenue: 135000 },
-          { month: 'Sep', patients: 460, revenue: 142000 },
-          { month: 'Oct', patients: 510, revenue: 148000 },
-          { month: 'Nov', patients: 540, revenue: 154200 },
-        ],
-        recentActivity: store.auditLogs,
+        charts: {
+          departmentDistribution: [
+            { name: 'Cardiology', value: 35 },
+            { name: 'Neurology', value: 20 },
+            { name: 'Orthopedics', value: 18 },
+            { name: 'Pediatrics', value: 15 },
+            { name: 'General Medicine', value: 30 },
+          ],
+          monthlyRegistrations: [
+            { month: 'Jun 2026', patients: 45 },
+            { month: 'Jul 2026', patients: 52 },
+            { month: 'Aug 2026', patients: 61 },
+            { month: 'Sep 2026', patients: 75 },
+            { month: 'Oct 2026', patients: 88 },
+            { month: 'Nov 2026', patients: 95 },
+          ],
+          monthlyRevenue: [
+            { month: 'Jun 2026', revenue: 42000, collected: 39000 },
+            { month: 'Jul 2026', revenue: 51000, collected: 48000 },
+            { month: 'Aug 2026', revenue: 63000, collected: 59000 },
+            { month: 'Sep 2026', revenue: 78000, collected: 72000 },
+            { month: 'Oct 2026', revenue: 89000, collected: 83000 },
+            { month: 'Nov 2026', revenue: 95000, collected: 90000 },
+          ],
+          bedOccupancy: [
+            { name: 'Occupied', value: occupiedBeds, color: '#0284c7' },
+            { name: 'Available', value: availableBeds, color: '#10b981' },
+            { name: 'Maintenance', value: maintenanceBeds, color: '#f59e0b' },
+          ],
+        },
+        recentActivities: store.auditLogs,
       },
     };
   }
@@ -231,14 +275,25 @@ export const handleMockRequest = async (config) => {
       status: 200,
       data: {
         success: true,
-        summary: {
-          todayAppointmentsCount: store.appointments.length,
-          assignedPatientsCount: 18,
-          pendingLabReportsCount: 2,
-          prescriptionsWrittenToday: 5,
+        doctor: {
+          name: 'Dr. Sarah Jenkins',
+          specialization: 'Interventional Cardiology',
+          department: 'Cardiology',
+          roomNumber: 'OPD-302',
+          consultationFee: 650,
         },
-        todaySchedule: store.appointments,
-        recentPatients: store.patients,
+        stats: {
+          todayTotal: store.appointments.length + 4,
+          todayPending: 2,
+          todayCompleted: 3,
+          activeInpatients: 4,
+          pendingLabCount: 2,
+          totalPrescriptionsIssued: 14,
+        },
+        todayAppointments: store.appointments,
+        upcomingAppointments: store.appointments,
+        admissions: [],
+        pendingLabOrders: store.labOrders,
       },
     };
   }
@@ -248,21 +303,41 @@ export const handleMockRequest = async (config) => {
       status: 200,
       data: {
         success: true,
-        summary: {
+        patient: store.patients[0],
+        stats: {
           upcomingAppointmentsCount: 1,
           prescriptionsCount: store.prescriptions.length,
           labReportsCount: store.labOrders.length,
-          unpaidBillsCount: store.bills.filter((b) => b.status === 'Pending').length,
+          medicalRecordsCount: 3,
+          totalBilled: 1620,
+          totalPaid: 770,
+          balanceDue: 850,
         },
-        upcomingAppointments: store.appointments.slice(0, 2),
-        activePrescriptions: store.prescriptions,
+        upcomingAppointments: store.appointments.slice(0, 1),
+        recentAppointments: store.appointments,
+        recentPrescriptions: store.prescriptions,
         recentLabReports: store.labOrders,
         bills: store.bills,
       },
     };
   }
 
-  // 4. Clinical & Management Modules
+  if (url.startsWith('/analytics/global-search') && method === 'get') {
+    return {
+      status: 200,
+      data: {
+        success: true,
+        results: {
+          patients: store.patients,
+          doctors: store.doctors,
+          appointments: store.appointments,
+          medicines: store.inventory,
+        },
+      },
+    };
+  }
+
+  // 4. Clinical & Operations Modules
   if (url.startsWith('/departments') && method === 'get') {
     return { status: 200, data: { success: true, count: store.departments.length, departments: store.departments } };
   }
