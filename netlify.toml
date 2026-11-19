@@ -1,9 +1,9 @@
 # Netlify Production Configuration for Smart Hospital Management System
+"$schema" = "https://open-api.netlify.com/netlify.schema.json"
 
 [build]
-  base = "frontend"
-  publish = "dist"
-  command = "npm run build"
+  command = "cd frontend && npm install && npm run build"
+  publish = "frontend/dist"
 
 [build.environment]
   NODE_VERSION = "20"
