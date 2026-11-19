@@ -1,11 +1,14 @@
 import axios from 'axios';
 import { handleMockRequest } from './mockHandler';
 
-// Detect whether we are on a static host (GitHub Pages, Netlify without dedicated backend)
+// Detect whether we are running on a static cloud host without a dedicated backend server
 const isStaticHost =
   typeof window !== 'undefined' &&
   (window.location.hostname.includes('github.io') ||
-    (window.location.hostname.includes('netlify.app') && !import.meta.env.VITE_API_URL));
+   window.location.hostname.includes('netlify.app') ||
+   window.location.hostname.includes('vercel.app') ||
+   window.location.protocol === 'file:' ||
+   (!import.meta.env.VITE_API_URL && window.location.port !== '5173'));
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || '/api',
@@ -13,6 +16,8 @@ const api = axios.create({
     'Content-Type': 'application/json',
   },
   timeout: 8000,
+  // If running on static hosting without custom VITE_API_URL, route directly via client mock adapter
+  adapter: isStaticHost ? async (config) => handleMockRequest(config) : undefined,
 });
 
 // Request interceptor to attach JWT token
@@ -27,32 +32,35 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Response interceptor with seamless interactive mock fallback for static cloud deployments
+// Response interceptor: catches HTML fallback responses (Netlify SPA rewrites) or 404/network errors
 api.interceptors.response.use(
-  (response) => response,
+  async (response) => {
+    // If a static server rewrite returned index.html instead of JSON:
+    const isHtmlResponse =
+      typeof response.data === 'string' &&
+      (response.data.includes('<!doctype') ||
+       response.data.includes('<!DOCTYPE') ||
+       response.data.includes('<html'));
+
+    if (isHtmlResponse) {
+      console.warn(`[Apex Care API] Server returned HTML for ${response.config?.url}. Falling back to mock layer.`);
+      return handleMockRequest(response.config);
+    }
+
+    return response;
+  },
   async (error) => {
     const originalRequest = error.config;
-
-    // Detect if this is an unreachable endpoint or 404 on static hosts
-    const isNetworkError = !error.response || error.code === 'ERR_NETWORK';
-    const isNotFoundOrServerDown =
-      error.response?.status === 404 ||
-      error.response?.status === 502 ||
-      error.response?.status === 503 ||
-      error.response?.status === 504;
-
-    if (originalRequest && (isNetworkError || isNotFoundOrServerDown || isStaticHost)) {
+    if (originalRequest) {
       try {
-        console.warn(`[Apex Care API] Routing ${originalRequest.method?.toUpperCase()} ${originalRequest.url} to local interactive mock layer.`);
-        const mockResponse = await handleMockRequest(originalRequest);
-        return mockResponse;
+        console.warn(`[Apex Care API] Falling back to mock layer for ${originalRequest.url}: ${error.message}`);
+        return await handleMockRequest(originalRequest);
       } catch (mockError) {
         return Promise.reject(mockError);
       }
     }
 
     if (error.response?.status === 401) {
-      // Clear token only if on a protected route
       const currentLoc = window.location.href;
       if (!currentLoc.includes('/login') && !currentLoc.includes('/register')) {
         localStorage.removeItem('hms_token');

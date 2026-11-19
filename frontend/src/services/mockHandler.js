@@ -9,14 +9,24 @@ const generateMockToken = (user) => {
 
 export const handleMockRequest = async (config) => {
   const method = (config.method || 'get').toLowerCase();
-  const url = config.url || '';
+  const rawUrl = config.url || '';
+  
+  // Normalize URL to always start with / and strip /api and query strings
+  let cleanUrl = rawUrl.split('?')[0];
+  if (cleanUrl.startsWith('/api')) {
+    cleanUrl = cleanUrl.slice(4);
+  }
+  if (!cleanUrl.startsWith('/')) {
+    cleanUrl = '/' + cleanUrl;
+  }
+
   const data = typeof config.data === 'string' ? JSON.parse(config.data || '{}') : (config.data || {});
   const store = getMockStore();
 
-  console.info(`[Demo Fallback Layer] Handling ${method.toUpperCase()} ${url}`);
+  console.info(`[Apex Care Mock Engine] ${method.toUpperCase()} ${cleanUrl}`);
 
   // 1. Authentication Endpoints
-  if (url === '/auth/login' && method === 'post') {
+  if (cleanUrl === '/auth/login' && method === 'post') {
     const { email, password } = data;
     const cleanEmail = (email || '').toLowerCase().trim();
     const user = store.users.find((u) => u.email.toLowerCase() === cleanEmail);
@@ -51,7 +61,7 @@ export const handleMockRequest = async (config) => {
     };
   }
 
-  if (url === '/auth/me' && method === 'get') {
+  if (cleanUrl === '/auth/me' && method === 'get') {
     const savedUser = localStorage.getItem('hms_user');
     const user = savedUser ? JSON.parse(savedUser) : store.users[0];
     return {
@@ -63,7 +73,7 @@ export const handleMockRequest = async (config) => {
     };
   }
 
-  if (url === '/auth/register' && method === 'post') {
+  if (cleanUrl === '/auth/register' && method === 'post') {
     const { role, name, email, phone, specialization, qualification, licenseNumber } = data;
 
     if (role === 'admin') {
@@ -132,32 +142,33 @@ export const handleMockRequest = async (config) => {
     };
   }
 
-  if (url === '/auth/logout' && method === 'post') {
+  if (cleanUrl === '/auth/logout' && method === 'post') {
     return { status: 200, data: { success: true, message: 'Logged out successfully' } };
   }
 
-  if (url === '/auth/forgot-password' && method === 'post') {
+  if (cleanUrl === '/auth/forgot-password' && method === 'post') {
     return { status: 200, data: { success: true, message: 'Password reset link sent to registered email (Demo)' } };
   }
 
-  if (url.startsWith('/auth/reset-password') && method === 'put') {
+  if (cleanUrl.startsWith('/auth/reset-password') && method === 'put') {
     return { status: 200, data: { success: true, message: 'Password has been reset successfully' } };
   }
 
   // 2. Approvals Endpoints
-  if (url.startsWith('/auth/approvals') && method === 'get') {
-    if (url.includes('/stats')) {
-      const pending = store.approvals.filter((a) => a.approvalStatus === 'Pending').length;
-      const approved = store.approvals.filter((a) => a.approvalStatus === 'Approved').length;
-      const rejected = store.approvals.filter((a) => a.approvalStatus === 'Rejected').length;
-      return {
-        status: 200,
-        data: {
-          success: true,
-          stats: { pending, approved, rejected, total: store.approvals.length },
-        },
-      };
-    }
+  if (cleanUrl === '/auth/approvals/stats' && method === 'get') {
+    const pending = store.approvals.filter((a) => a.approvalStatus === 'Pending').length;
+    const approved = store.approvals.filter((a) => a.approvalStatus === 'Approved').length;
+    const rejected = store.approvals.filter((a) => a.approvalStatus === 'Rejected').length;
+    return {
+      status: 200,
+      data: {
+        success: true,
+        stats: { pending, approved, rejected, total: store.approvals.length },
+      },
+    };
+  }
+
+  if (cleanUrl.startsWith('/auth/approvals') && method === 'get') {
     return {
       status: 200,
       data: {
@@ -168,8 +179,8 @@ export const handleMockRequest = async (config) => {
     };
   }
 
-  if (url.includes('/auth/approvals/') && url.endsWith('/approve') && method === 'post') {
-    const id = url.split('/')[3];
+  if (cleanUrl.startsWith('/auth/approvals/') && cleanUrl.endsWith('/approve') && method === 'post') {
+    const id = cleanUrl.split('/')[3];
     const app = store.approvals.find((a) => a._id === id);
     if (app) {
       app.approvalStatus = 'Approved';
@@ -180,8 +191,8 @@ export const handleMockRequest = async (config) => {
     return { status: 200, data: { success: true, message: 'Applicant registration approved successfully' } };
   }
 
-  if (url.includes('/auth/approvals/') && url.endsWith('/reject') && method === 'post') {
-    const id = url.split('/')[3];
+  if (cleanUrl.startsWith('/auth/approvals/') && cleanUrl.endsWith('/reject') && method === 'post') {
+    const id = cleanUrl.split('/')[3];
     const app = store.approvals.find((a) => a._id === id);
     if (app) {
       app.approvalStatus = 'Rejected';
@@ -192,7 +203,7 @@ export const handleMockRequest = async (config) => {
   }
 
   // 3. Dashboards & Analytics
-  if (url.startsWith('/analytics/dashboard') && method === 'get') {
+  if (cleanUrl === '/analytics/dashboard' && method === 'get') {
     const totalPatients = store.patients.length + 124;
     const totalDoctors = store.doctors.length + 16;
     const totalStaff = 48;
@@ -270,13 +281,15 @@ export const handleMockRequest = async (config) => {
     };
   }
 
-  if (url === '/analytics/doctor-summary' && method === 'get') {
+  if (cleanUrl === '/analytics/doctor-summary' && method === 'get') {
     return {
       status: 200,
       data: {
         success: true,
         doctor: {
+          id: 'doc_1',
           name: 'Dr. Sarah Jenkins',
+          doctorId: 'HMS-DOC-1001',
           specialization: 'Interventional Cardiology',
           department: 'Cardiology',
           roomNumber: 'OPD-302',
@@ -298,7 +311,7 @@ export const handleMockRequest = async (config) => {
     };
   }
 
-  if (url === '/analytics/patient-summary' && method === 'get') {
+  if (cleanUrl === '/analytics/patient-summary' && method === 'get') {
     return {
       status: 200,
       data: {
@@ -322,7 +335,7 @@ export const handleMockRequest = async (config) => {
     };
   }
 
-  if (url.startsWith('/analytics/global-search') && method === 'get') {
+  if (cleanUrl === '/analytics/global-search' && method === 'get') {
     return {
       status: 200,
       data: {
@@ -338,15 +351,35 @@ export const handleMockRequest = async (config) => {
   }
 
   // 4. Clinical & Operations Modules
-  if (url.startsWith('/departments') && method === 'get') {
+  if (cleanUrl === '/departments' && method === 'get') {
     return { status: 200, data: { success: true, count: store.departments.length, departments: store.departments } };
   }
 
-  if (url.startsWith('/patients') && method === 'get') {
+  if (cleanUrl === '/patients' && method === 'get') {
     return { status: 200, data: { success: true, count: store.patients.length, patients: store.patients } };
   }
 
-  if (url === '/patients' && method === 'post') {
+  if (cleanUrl.startsWith('/patients/') && cleanUrl.endsWith('/timeline') && method === 'get') {
+    return {
+      status: 200,
+      data: {
+        success: true,
+        timeline: [
+          { date: new Date().toISOString(), type: 'Consultation', title: 'Cardiology Review', details: 'Normal sinus rhythm, BP 120/80 mmHg' },
+          { date: new Date(Date.now() - 86400000 * 3).toISOString(), type: 'Lab Test', title: 'Complete Blood Count (CBC)', details: 'Hemoglobin 14.2 g/dL' },
+          { date: new Date(Date.now() - 86400000 * 14).toISOString(), type: 'Prescription', title: 'Hypertension Refill', details: 'Amlodipine 5mg - 30 days' },
+        ],
+      },
+    };
+  }
+
+  if (cleanUrl.startsWith('/patients/') && method === 'get') {
+    const id = cleanUrl.split('/')[2];
+    const pat = store.patients.find((p) => p._id === id || p.uhid === id) || store.patients[0];
+    return { status: 200, data: { success: true, patient: pat } };
+  }
+
+  if (cleanUrl === '/patients' && method === 'post') {
     const newPat = {
       _id: `pat_${Date.now()}`,
       uhid: `HMS-PAT-${Math.floor(10000 + Math.random() * 90000)}`,
@@ -360,15 +393,25 @@ export const handleMockRequest = async (config) => {
     return { status: 201, data: { success: true, patient: newPat } };
   }
 
-  if (url.startsWith('/doctors') && method === 'get') {
+  if (cleanUrl === '/doctors' && method === 'get') {
     return { status: 200, data: { success: true, count: store.doctors.length, doctors: store.doctors } };
   }
 
-  if (url.startsWith('/appointments') && method === 'get') {
+  if (cleanUrl.startsWith('/doctors/') && cleanUrl.endsWith('/slots') && method === 'get') {
+    return {
+      status: 200,
+      data: {
+        success: true,
+        slots: ['09:00 AM', '09:30 AM', '10:00 AM', '10:30 AM', '11:00 AM', '02:00 PM', '02:30 PM', '03:00 PM'],
+      },
+    };
+  }
+
+  if (cleanUrl === '/appointments' && method === 'get') {
     return { status: 200, data: { success: true, count: store.appointments.length, appointments: store.appointments } };
   }
 
-  if (url === '/appointments' && method === 'post') {
+  if (cleanUrl === '/appointments' && method === 'post') {
     const newApt = {
       _id: `apt_${Date.now()}`,
       appointmentNumber: `APT-202611-${Math.floor(1000 + Math.random() * 9000)}`,
@@ -382,19 +425,38 @@ export const handleMockRequest = async (config) => {
     return { status: 201, data: { success: true, appointment: newApt } };
   }
 
-  if (url.startsWith('/prescriptions') && method === 'get') {
+  if (cleanUrl.startsWith('/appointments/') && cleanUrl.endsWith('/check-in') && method === 'patch') {
+    const id = cleanUrl.split('/')[2];
+    const apt = store.appointments.find((a) => a._id === id);
+    if (apt) apt.status = 'Checked-In';
+    saveMockStore(store);
+    return { status: 200, data: { success: true, appointment: apt } };
+  }
+
+  if (cleanUrl === '/prescriptions' && method === 'get') {
     return { status: 200, data: { success: true, count: store.prescriptions.length, prescriptions: store.prescriptions } };
   }
 
-  if (url.startsWith('/pharmacy/inventory') && method === 'get') {
-    return { status: 200, data: { success: true, count: store.inventory.length, inventory: store.inventory } };
+  if (cleanUrl === '/pharmacy/inventory' && method === 'get') {
+    return {
+      status: 200,
+      data: {
+        success: true,
+        count: store.inventory.length,
+        inventory: store.inventory,
+        alerts: {
+          lowStockCount: store.inventory.filter((i) => i.status === 'Low Stock').length,
+          expiringCount: 0,
+        },
+      },
+    };
   }
 
-  if (url.startsWith('/lab/orders') && method === 'get') {
+  if (cleanUrl === '/lab/orders' && method === 'get') {
     return { status: 200, data: { success: true, count: store.labOrders.length, orders: store.labOrders } };
   }
 
-  if (url.startsWith('/lab/tests') && method === 'get') {
+  if (cleanUrl === '/lab/tests' && method === 'get') {
     return {
       status: 200,
       data: {
@@ -408,11 +470,11 @@ export const handleMockRequest = async (config) => {
     };
   }
 
-  if (url.startsWith('/wards/wards') && method === 'get') {
+  if (cleanUrl === '/wards/wards' && method === 'get') {
     return { status: 200, data: { success: true, wards: store.wards } };
   }
 
-  if (url.startsWith('/wards/bed-matrix') && method === 'get') {
+  if (cleanUrl === '/wards/bed-matrix' && method === 'get') {
     return {
       status: 200,
       data: {
@@ -428,11 +490,22 @@ export const handleMockRequest = async (config) => {
     };
   }
 
-  if (url.startsWith('/billing') && method === 'get') {
+  if (cleanUrl === '/billing' && method === 'get') {
     return { status: 200, data: { success: true, count: store.bills.length, bills: store.bills } };
   }
 
-  if (url === '/triage/assess' && method === 'post') {
+  if (cleanUrl.startsWith('/billing/') && cleanUrl.endsWith('/payment') && method === 'post') {
+    const id = cleanUrl.split('/')[2];
+    const bill = store.bills.find((b) => b._id === id);
+    if (bill) {
+      bill.paidAmount = bill.totalAmount;
+      bill.status = 'Paid';
+    }
+    saveMockStore(store);
+    return { status: 200, data: { success: true, message: 'Payment processed successfully', bill } };
+  }
+
+  if (cleanUrl === '/triage/assess' && method === 'post') {
     const symptoms = (data.symptoms || []).join(' ').toLowerCase();
     let triageLevel = 'Non-Urgent (Green)';
     let recommendation = 'Standard outpatient consultation recommended within 48 hours.';
@@ -463,11 +536,11 @@ export const handleMockRequest = async (config) => {
     };
   }
 
-  if (url.startsWith('/audit-logs') && method === 'get') {
+  if (cleanUrl === '/audit-logs' && method === 'get') {
     return { status: 200, data: { success: true, logs: store.auditLogs } };
   }
 
-  if (url.startsWith('/notifications') && method === 'get') {
+  if (cleanUrl === '/notifications' && method === 'get') {
     return {
       status: 200,
       data: {
