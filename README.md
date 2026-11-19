@@ -4,6 +4,14 @@
 
 ---
 
+## 🌐 Live Production Deployments
+
+- 🚀 **GitHub Pages Live App:** [https://sahdipak01.github.io/Smart-Hospital-Management-and-Patient-Care-System/](https://sahdipak01.github.io/Smart-Hospital-Management-and-Patient-Care-System/)
+- ⚡ **Netlify Live App:** [https://smart-hospital-care.netlify.app/](https://smart-hospital-care.netlify.app/)
+- 📦 **GitHub Source Repository:** [https://github.com/SahDipak01/Smart-Hospital-Management-and-Patient-Care-System](https://github.com/SahDipak01/Smart-Hospital-Management-and-Patient-Care-System)
+
+---
+
 ## 1. System Overview & Architecture
 
 Apex Memorial Smart Hospital is engineered following clean code principles, domain-driven design, and robust security standards.
@@ -41,18 +49,30 @@ Smart-Hospital-Management-System/
 
 ---
 
-## 2. Default Demo User Accounts
+## 2. Default Demo User Accounts & Test Credentials
 
-The database comes pre-seeded with realistic healthcare data and user accounts across all 4 roles. You can either select them with one click on the login screen or use the credentials below:
+The database and interactive cloud preview come pre-seeded with clinical & operational data across all 8 user roles.
+
+### 🔑 Test Accounts (Password: `password123`)
+- **Hospital Administrator:** `admin@hospital.com`
+- **Lead Doctor / Cardiologist:** `doctor.smith@hospital.com`
+- **Registered Patient:** `patient.doe@hospital.com`
+- **Head Nurse:** `nurse.sarah@hospital.com`
+- **Pharmacist:** `pharmacist.john@hospital.com`
+- **Lab Technician:** `lab.david@hospital.com`
+- **Front-Desk Receptionist:** `receptionist.mary@hospital.com`
+- **Billing Specialist:** `billing.lisa@hospital.com`
 
 | Role | Email | Password | Access Scope |
 | :--- | :--- | :--- | :--- |
-| **Administrator** | `admin@hospital.com` | `Admin@123` | Global Operations, Analytics, Doctors, Wards, Beds, Pharmacy, Audit Logs |
-| **Doctor (Cardiology)** | `dr.sarah@hospital.com` | `Doctor@123` | Outpatient Queue, Clinical Encounters, e-Prescriptions, Lab Requests |
-| **Doctor (Neurology)** | `dr.james@hospital.com` | `Doctor@123` | Neurological Consultations, Inpatients, e-Prescriptions |
-| **Patient (John Doe)** | `john.doe@email.com` | `Patient@123` | Patient Portal, Appointments, Health Records, Prescriptions, Triage |
-| **Staff (Head Nurse)** | `nurse.clara@hospital.com` | `Staff@123` | Inpatient Bed Allocation, Vitals Recording, Ward Transfers |
-| **Staff (Pharmacist)** | `pharmacist.alex@hospital.com` | `Staff@123` | Pharmacy Stock Catalog, Prescription Dispensing, Expiry Alerts |
+| **Hospital Administrator** | `admin@hospital.com` | `password123` | Global Operations, Analytics, Doctors, Staff, Approvals Hub, Wards, Beds, Pharmacy, Audit Logs |
+| **Lead Doctor / Cardiologist** | `doctor.smith@hospital.com` | `password123` | Outpatient Queue, Clinical Encounters, e-Prescriptions, Lab Orders, Wards |
+| **Registered Patient** | `patient.doe@hospital.com` | `password123` | Patient Portal, Appointment Booking, EMR Timeline, Prescriptions, Lab Reports, Invoices |
+| **Head Nurse** | `nurse.sarah@hospital.com` | `password123` | Clinical Workstation, Bed Census, Inpatient Transfers, Vitals & Triage |
+| **Pharmacist** | `pharmacist.john@hospital.com` | `password123` | Pharmacy Stock Catalog, Prescription Dispensing, Low-Stock Warnings |
+| **Lab Technician** | `lab.david@hospital.com` | `password123` | Diagnostic Lab Orders, Specimen Processing, Test Results & Parameter Entry |
+| **Front-Desk Receptionist** | `receptionist.mary@hospital.com` | `password123` | Patient Registration, Desk Check-In, Doctor OPD Scheduling & Queue Allocation |
+| **Billing Specialist** | `billing.lisa@hospital.com` | `password123` | Invoicing Desk, Automated Bill Generation, Payment Collections & Balances |
 
 ---
 
