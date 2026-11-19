@@ -150,42 +150,7 @@ The database and interactive cloud preview come pre-seeded with clinical & opera
 
 ---
 
-## 4. How to Run the Application Locally
 
-### Prerequisites
-- Node.js (v18 or higher)
-- npm (v9 or higher)
-
-### Step 1: Start the Backend Server
-```bash
-cd backend
-npm install
-npm start
-```
-*Note: The backend is pre-configured to connect to local MongoDB or MongoDB Atlas via `MONGODB_URI`. If local MongoDB service is not started, it automatically spins up an embedded high-performance MongoDB instance, seeds all demo clinical data, and serves the API on port `5000`.*
-
-### Step 2: Start the Frontend Application
-```bash
-cd frontend
-npm install
-npm run dev
-```
-Open your browser to `http://localhost:5173`.
-
----
-
-## 5. Security & Data Protection
-
-- **Password Security**: Hashed using bcrypt with 10 salt rounds before storage in MongoDB; never stored in plaintext.
-- **Session Tokens**: Signed JSON Web Tokens (JWT) with configurable expiry (7 days by default) and strict `TokenExpiredError` detection returning `401`.
-- **Crypto Password Recovery**: SHA-256 hashed 15-minute expiring tokens generated via `crypto.randomBytes(32)` for secure password recovery.
-- **RBAC Enforcement**: Middleware verified on both frontend protected routes and backend controller endpoints with automatic role mismatch redirects and `403 Forbidden` JSON responses.
-- **Patient Isolation Boundary**: Multi-tenant data segregation preventing any patient from accessing, querying, or modifying other patients' medical charts, prescriptions, appointments, or bills.
-- **Audit Logging**: Structured security event logging recording `AUTH_LOGIN`, `AUTH_LOGOUT`, `USER_PROFILE_UPDATE`, `PASSWORD_CHANGE`, `PASSWORD_RESET_REQUEST`, `PASSWORD_RESET_SUCCESS`, and `UNAUTHORIZED_ACCESS_ATTEMPT`.
-- **HTTP Protection**: Configured with `helmet`, CORS restriction, and express rate limiting.
-- **Data Integrity**: Atomic database updates ensure stock quantities and bed availability remain consistent even under concurrent operations.
-
----
 
 ## 6. Authentication & RBAC API Specification
 
@@ -418,62 +383,12 @@ The master suite executes 34 real-world integration tests validating the end-to-
 * **Node.js**: v18.0.0 or higher
 * **MongoDB**: Local MongoDB instance (or rely on the automated embedded fallback)
 
-### Step 1: Install Dependencies
-```bash
-# Install backend dependencies
-cd backend
-npm install
 
-# Install frontend dependencies
-cd ../frontend
-npm install
-cd ..
-```
-
-### Step 2: Environment Configuration
-Backend `.env` is pre-configured with default values. You can inspect `backend/.env.example`:
-```env
-PORT=5000
-NODE_ENV=development
-JWT_SECRET=your_secure_random_jwt_secret_key_2026_production
-JWT_EXPIRES_IN=7d
-MONGODB_URI=mongodb://127.0.0.1:27017/smart_hospital_db
-CLIENT_URL=http://localhost:5173
-```
-
-### Step 3: Start the Backend Server
-```bash
-cd backend
-npm start
-```
 *The server will automatically connect to MongoDB (or launch the embedded engine) and seed realistic healthcare data if the database is fresh.*
 
-### Step 4: Start the Frontend Application
-```bash
-cd frontend
-npm run dev
-```
-*Open [http://localhost:5173](http://localhost:5173) in your browser.*
 
-### Step 5: Run Automated Tests
-```bash
-# Run Master End-to-End System Integration Suite
-npm run test:backend
 
-# Run All Automated Test Suites (98 tests)
-npm run test:all
-```
 
----
-
-## 13. Production Deployment Preparation
-
-1. **Frontend Production Build**:
-   ```bash
-   cd frontend
-   npm run build
-   ```
-   *Static assets are compiled to `frontend/dist` with optimized CSS and JavaScript bundles.*
 
 2. **Security Recommendations for Production**:
    - Set a strong, randomly generated `JWT_SECRET` in production.
