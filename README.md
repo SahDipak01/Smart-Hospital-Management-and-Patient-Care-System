@@ -49,30 +49,22 @@ Smart-Hospital-Management-System/
 
 ---
 
-## 2. Default Demo User Accounts & Test Credentials
+## 2. Verified Role-Based Login Accounts & Credentials
 
-The database and interactive cloud preview come pre-seeded with clinical & operational data across all 8 user roles.
+The system is configured with strictly four primary role-based healthcare user accounts. Passwords are securely hashed with `bcryptjs` (salt rounds: 10) in MongoDB and enforce role-based access control (RBAC).
 
-### 🔑 Test Accounts (Password: `password123`)
-- **Hospital Administrator:** `admin@hospital.com`
-- **Lead Doctor / Cardiologist:** `doctor.smith@hospital.com`
-- **Registered Patient:** `patient.doe@hospital.com`
-- **Head Nurse:** `nurse.sarah@hospital.com`
-- **Pharmacist:** `pharmacist.john@hospital.com`
-- **Lab Technician:** `lab.david@hospital.com`
-- **Front-Desk Receptionist:** `receptionist.mary@hospital.com`
-- **Billing Specialist:** `billing.lisa@hospital.com`
+### 🔑 Active Production & Demonstration Accounts
 
-| Role | Email | Password | Access Scope |
+| Role | Email | Password | Primary Scope & Access Route |
 | :--- | :--- | :--- | :--- |
-| **Hospital Administrator** | `admin@hospital.com` | `password123` | Global Operations, Analytics, Doctors, Staff, Approvals Hub, Wards, Beds, Pharmacy, Audit Logs |
-| **Lead Doctor / Cardiologist** | `doctor.smith@hospital.com` | `password123` | Outpatient Queue, Clinical Encounters, e-Prescriptions, Lab Orders, Wards |
-| **Registered Patient** | `patient.doe@hospital.com` | `password123` | Patient Portal, Appointment Booking, EMR Timeline, Prescriptions, Lab Reports, Invoices |
-| **Head Nurse** | `nurse.sarah@hospital.com` | `password123` | Clinical Workstation, Bed Census, Inpatient Transfers, Vitals & Triage |
-| **Pharmacist** | `pharmacist.john@hospital.com` | `password123` | Pharmacy Stock Catalog, Prescription Dispensing, Low-Stock Warnings |
-| **Lab Technician** | `lab.david@hospital.com` | `password123` | Diagnostic Lab Orders, Specimen Processing, Test Results & Parameter Entry |
-| **Front-Desk Receptionist** | `receptionist.mary@hospital.com` | `password123` | Patient Registration, Desk Check-In, Doctor OPD Scheduling & Queue Allocation |
-| **Billing Specialist** | `billing.lisa@hospital.com` | `password123` | Invoicing Desk, Automated Bill Generation, Payment Collections & Balances |
+| **Administrator** | `admin@hospital.com` | `Admin@123` | Executive System Operations, User Approvals Hub, Bed Matrix, Audit Trail (`/admin/dashboard`) |
+| **Doctor** | `dr.sarah@hospital.com` | `Doctor@123` | Outpatient OPD Queue, Clinical Consultations, EMR Timeline, e-Prescriptions, Lab Requests (`/doctor/dashboard`) |
+| **Patient** | `john.doe@email.com` | `Patient@123` | Digital Health Card (UHID: `HMS-PAT-10001`), Appointment Bookings, Invoices, Medical Records (`/patient/dashboard`) |
+| **Nurse** | `nurse.sarah@hospital.com` | `Nurse@123` | Ward Bed Census, Inpatient Vitals, Nursing Care Updates, Shift Tasks (`/staff/dashboard`) |
+
+> ℹ️ *Additional pre-seeded staff account:* `nurse.clara@hospital.com` (`Staff@123`).
+> 
+> *Note: The separate 1-click live demo cards and green demo button have been intentionally removed in accordance with enterprise security standards. All four roles authenticate via the standard email and password authentication interface.*
 
 ---
 
@@ -371,9 +363,10 @@ The master suite executes 34 real-world integration tests validating the end-to-
 | **Authentication & RBAC** | `test_auth_rbac.js` | JWT, bcrypt, password reset, RBAC, data boundaries | 39 | 39 | 0 | **100%** |
 | **Role-Based Dashboards** | `test_dashboards.js` | Analytics, doctor workbench, patient health portal | 11 | 11 | 0 | **100%** |
 | **Patient, Doctor & Depts** | `test_patient_doctor_dept.js` | Onboarding, UHID, profiles, slot generation | 20 | 20 | 0 | **100%** |
-| **Registration Approvals** | `test_auth_approvals.js` | Dynamic role registration, approval hub, rejection reasons | 18 | 18 | 0 | **100%** |
+| **Registration Approvals** | `test_auth_approvals.js` | Dynamic role registration, approval hub, rejection reasons | 21 | 21 | 0 | **100%** |
 | **Master System Suite** | `test_master_system.js` | Complete clinical lifecycle, bed transfers, check-in, search | 34 | 34 | 0 | **100%** |
-| **TOTAL VERIFIED TESTS** | — | — | **122** | **122** | **0** | **100%** |
+| **QA Master Verification Audit** | `test_qa_master_audit.cjs` | 12-Module End-to-End Audit & Edge Cases | 22 | 22 | 0 | **100%** |
+| **TOTAL VERIFIED TESTS** | — | — | **147** | **147** | **0** | **100%** |
 
 ---
 
