@@ -27,36 +27,6 @@ const Login = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  const handleQuickDemo = async (demoEmail) => {
-    setEmail(demoEmail);
-    setPassword('password123');
-    setErrorInfo(null);
-    setIsLoading(true);
-
-    try {
-      const user = await login(demoEmail, 'password123', true);
-      if (user.role === 'admin') {
-        navigate('/admin/dashboard');
-      } else if (user.role === 'doctor') {
-        navigate('/doctor/dashboard');
-      } else if (user.role === 'patient') {
-        navigate('/patient/dashboard');
-      } else if (STAFF_ROLES.includes(user.role)) {
-        navigate('/staff/dashboard');
-      } else {
-        navigate('/');
-      }
-    } catch (err) {
-      const data = err.response?.data;
-      setErrorInfo({
-        message: data?.message || err.message || 'Authentication failed. Please verify credentials.',
-        accountStatus: data?.accountStatus || null,
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   useEffect(() => {
     const savedEmail = localStorage.getItem('hms_remembered_email');
     if (savedEmail) {
@@ -112,7 +82,7 @@ const Login = () => {
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md px-4 sm:px-0">
         <div className="bg-white py-8 px-6 sm:px-10 shadow-2xl rounded-2xl border border-slate-100">
           {/* Universal Portal Scope Notice */}
-          <div className="mb-4 p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 flex items-center gap-3">
+          <div className="mb-6 p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 flex items-center gap-3">
             <div className="p-2 rounded-lg bg-medical-50 text-medical-600 flex-shrink-0">
               <Shield className="w-4 h-4" />
             </div>
@@ -121,40 +91,6 @@ const Login = () => {
               <p className="text-[11px] text-slate-500">
                 Single sign-on for Administrators, Doctors, Patients, Nurses, Receptionists, Pharmacists, Lab Techs, and Billing Staff.
               </p>
-            </div>
-          </div>
-
-          {/* 1-Click Demo Login Selector */}
-          <div className="mb-6 p-3 rounded-xl bg-emerald-50/80 border border-emerald-200">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-900 flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                <span>1-Click Interactive Demo Access:</span>
-              </span>
-              <span className="text-[10px] text-emerald-700 font-mono">pw: password123</span>
-            </div>
-            <div className="grid grid-cols-4 gap-1.5">
-              {[
-                { label: 'Admin', email: 'admin@hospital.com' },
-                { label: 'Doctor', email: 'doctor.smith@hospital.com' },
-                { label: 'Patient', email: 'patient.doe@hospital.com' },
-                { label: 'Nurse', email: 'nurse.sarah@hospital.com' },
-                { label: 'Pharmacy', email: 'pharmacist.john@hospital.com' },
-                { label: 'Lab Tech', email: 'lab.david@hospital.com' },
-                { label: 'Reception', email: 'receptionist.mary@hospital.com' },
-                { label: 'Billing', email: 'billing.lisa@hospital.com' },
-              ].map((item) => (
-                <button
-                  key={item.label}
-                  type="button"
-                  onClick={() => handleQuickDemo(item.email)}
-                  disabled={isLoading}
-                  className="py-1 px-1.5 text-[10px] font-bold rounded-lg bg-white hover:bg-emerald-600 hover:text-white text-emerald-900 border border-emerald-200 hover:border-emerald-600 transition-colors shadow-2xs truncate text-center disabled:opacity-50"
-                  title={`Sign in as ${item.label} (${item.email})`}
-                >
-                  {item.label}
-                </button>
-              ))}
             </div>
           </div>
 
