@@ -12,24 +12,22 @@ const authorize = (...roles) => {
     }
 
     // Check approval status for medical and operational personnel
-    if (
-      req.user.role !== 'admin' &&
-      req.user.role !== 'patient' &&
-      (!req.user.isApproved || req.user.approvalStatus === 'Pending')
-    ) {
-      return res.status(403).json({
-        success: false,
-        accountStatus: 'Pending',
-        message: 'Your account registration is awaiting administrator approval. Please contact hospital administration.',
-      });
-    }
+    if (req.user.role !== 'admin' && req.user.role !== 'patient') {
+      if (req.user.approvalStatus === 'Rejected') {
+        return res.status(403).json({
+          success: false,
+          accountStatus: 'Rejected',
+          message: `Your registration request was rejected by the administrator. Reason: ${req.user.rejectionReason || 'Verification criteria not met.'}`,
+        });
+      }
 
-    if (req.user.approvalStatus === 'Rejected') {
-      return res.status(403).json({
-        success: false,
-        accountStatus: 'Rejected',
-        message: `Your registration request was rejected by the administrator. Reason: ${req.user.rejectionReason || 'Verification criteria not met.'}`,
-      });
+      if (!req.user.isApproved || req.user.approvalStatus === 'Pending') {
+        return res.status(403).json({
+          success: false,
+          accountStatus: 'Pending',
+          message: 'Your account registration is awaiting administrator approval. Please contact hospital administration.',
+        });
+      }
     }
 
     const userRole = req.user.role;

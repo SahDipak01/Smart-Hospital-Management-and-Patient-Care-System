@@ -295,25 +295,26 @@ const seedDatabaseIfEmpty = async () => {
     const nursePassword = 'Nurse@123';
     const staffConfigs = [
       { email: 'nurse.sarah@hospital.com', firstName: 'Sarah', lastName: 'Connor', roleType: 'nurse', deptCode: 'EMER', shift: 'Morning', password: nursePassword },
-      { email: 'nurse.clara@hospital.com', firstName: 'Clara', lastName: 'Oswald', roleType: 'nurse', deptCode: 'EMER', shift: 'Morning', password: nursePassword },
+      { email: 'nurse.clara@hospital.com', firstName: 'Clara', lastName: 'Oswald', roleType: 'staff', deptCode: 'EMER', shift: 'Morning', password: staffPassword },
       { email: 'pharmacist.alex@hospital.com', firstName: 'Alex', lastName: 'Mercer', roleType: 'pharmacist', deptCode: 'GENM', shift: 'Morning', password: staffPassword },
       { email: 'lab.robert@hospital.com', firstName: 'Robert', lastName: 'Langdon', roleType: 'lab_technician', deptCode: 'GENM', shift: 'Morning', password: staffPassword },
     ];
 
-    for (const s of staffConfigs) {
+    for (let sIdx = 0; sIdx < staffConfigs.length; sIdx++) {
+      const s = staffConfigs[sIdx];
       const u = await User.create({
         name: `${s.firstName} ${s.lastName}`,
         email: s.email,
         password: s.password || staffPassword,
         role: s.roleType === 'nurse' ? 'nurse' : 'staff',
-        phone: '+1 (555) 888-000' + s.firstName.length,
+        phone: `+1 (555) 888-000${sIdx + 1}`,
         isApproved: true,
         approvalStatus: 'Approved',
         isActive: true,
       });
 
       const stf = await Staff.create({
-        staffId: `HMS-STF-10${s.firstName.length}`,
+        staffId: `HMS-STF-10${sIdx + 1}`,
         user: u._id,
         firstName: s.firstName,
         lastName: s.lastName,

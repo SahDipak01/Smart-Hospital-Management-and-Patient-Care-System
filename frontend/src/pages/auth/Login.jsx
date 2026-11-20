@@ -7,7 +7,6 @@ import {
   Eye,
   EyeOff,
   LogIn,
-  Play,
   ChevronRight,
   ShieldCheck,
   Activity,
@@ -104,10 +103,8 @@ const Login = () => {
   const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [isDemoModalOpen, setIsDemoModalOpen] = useState(false);
-  const [launchingDemoRole, setLaunchingDemoRole] = useState(null);
 
-  const { login, startDemo } = useAuth();
+  const { login } = useAuth();
   const navigate = useNavigate();
 
   // Remember me logic
@@ -167,27 +164,6 @@ const Login = () => {
       );
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  // Launch live demo with realistic sample data
-  const handleStartDemo = async (roleId) => {
-    setLaunchingDemoRole(roleId);
-    setError(null);
-
-    try {
-      const loggedUser = await startDemo(roleId);
-      setIsDemoModalOpen(false);
-
-      if (loggedUser.role === 'admin') navigate('/admin/dashboard');
-      else if (loggedUser.role === 'doctor') navigate('/doctor/dashboard');
-      else if (loggedUser.role === 'patient') navigate('/patient/dashboard');
-      else navigate('/staff/dashboard');
-    } catch (err) {
-      console.error('Demo launch error:', err);
-      setError('Unable to initialize demo session. Please try again.');
-    } finally {
-      setLaunchingDemoRole(null);
     }
   };
 
@@ -271,26 +247,19 @@ const Login = () => {
                 alt="Smart Hospital Campus Facade"
                 className="w-full h-full object-cover object-center group-hover:scale-102 transition-transform duration-700 opacity-95"
                 onError={(e) => {
-                  // Fallback to high resolution healthcare campus photo if local crop is unavailable
                   e.currentTarget.src =
                     'https://images.unsplash.com/photo-1587351021759-3e566b6af7cc?auto=format&fit=crop&w=1200&q=80';
                 }}
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-transparent pointer-events-none" />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/40 via-transparent to-transparent pointer-events-none" />
 
-              {/* Hospital Entrance Sign Overlay */}
-              <div className="absolute top-4 left-4 bg-blue-600/90 backdrop-blur-md text-white text-xs font-bold px-3 py-1.5 rounded-lg shadow-md flex items-center gap-1.5">
-                <span className="text-white text-base leading-none font-black">+</span>
-                <span>HOSPITAL MAIN ENTRANCE</span>
+              {/* Bottom-left elegant blue wave ribbon with pulse and slogan */}
+              <div className="absolute bottom-0 left-0 bg-gradient-to-r from-[#0f2851]/95 via-[#1565c0]/85 to-transparent pr-8 pl-5 py-2.5 rounded-tr-3xl flex items-center gap-2.5 text-white backdrop-blur-2xs shadow-lg">
+                <svg className="w-7 h-4 text-white" viewBox="0 0 40 20" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <path d="M0 10h12l3-6 4 12 3-9 2 4 3-1h13" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+                <span className="text-xs sm:text-sm font-bold tracking-tight">Your Health. Our Priority.</span>
               </div>
-            </div>
-
-            {/* Decorative Wave with "Your Health. Our Priority." */}
-            <div className="hidden sm:flex items-center gap-3 pt-1 text-slate-500 text-xs font-semibold">
-              <svg className="w-8 h-4 text-blue-600" viewBox="0 0 40 20" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <path d="M0 10h12l3-6 4 12 3-9 2 4 3-1h13" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-              <span>Your Health. Our Priority.</span>
             </div>
           </section>
 
@@ -442,43 +411,8 @@ const Login = () => {
                 </button>
               </form>
 
-              {/* Divider: OR */}
-              <div className="relative my-4 flex items-center justify-center">
-                <div className="border-t border-slate-200 w-full" />
-                <span className="bg-white px-3 text-[11px] font-bold text-slate-400 uppercase tracking-widest absolute">
-                  OR
-                </span>
-              </div>
-
-              {/* Mint Green Live Demo Card matching mockup */}
-              <div
-                onClick={() => setIsDemoModalOpen(true)}
-                className="bg-[#dcfce7] hover:bg-[#bbf7d0] border border-[#86efac] rounded-2xl p-3 sm:p-3.5 flex items-center justify-between transition-all cursor-pointer group shadow-2xs"
-                role="button"
-                tabIndex={0}
-                title="Explore the hospital system with realistic sample data"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-emerald-600/15 flex items-center justify-center text-emerald-700 group-hover:scale-105 transition-transform flex-shrink-0">
-                    <Play className="w-4 h-4 fill-emerald-600 text-emerald-600 ml-0.5" />
-                  </div>
-                  <div>
-                    <div className="text-sm font-extrabold text-slate-900 group-hover:text-emerald-950 leading-tight">
-                      Live Demo
-                    </div>
-                    <div className="text-[11px] text-slate-600 font-medium">
-                      Explore the system with sample data
-                    </div>
-                  </div>
-                </div>
-
-                <div className="text-slate-500 group-hover:text-slate-800 group-hover:translate-x-1 transition-all">
-                  <ChevronRight className="w-5 h-5" />
-                </div>
-              </div>
-
               {/* Compliance & Security Footer inside card */}
-              <div className="mt-4 pt-3.5 border-t border-slate-100 flex items-center justify-center gap-1.5 text-[10px] sm:text-[11px] font-semibold text-slate-500">
+              <div className="mt-6 pt-5 border-t border-slate-100 flex items-center justify-center gap-1.5 text-[10px] sm:text-[11px] font-semibold text-slate-500">
                 <ShieldCheck className="w-3.5 h-3.5 text-blue-600 flex-shrink-0" />
                 <span>Secure Access</span>
                 <span className="text-slate-300">|</span>
@@ -494,84 +428,15 @@ const Login = () => {
       </main>
 
       {/* Subtle Bottom Wave Accent */}
-      <footer className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 text-center sm:text-left text-[11px] text-slate-500 flex flex-col sm:flex-row items-center justify-between gap-2 z-10">
+      <footer className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 text-center sm:text-left text-[11px] text-slate-500 flex flex-col sm:flex-row items-center justify-between gap-2 z-10 border-t border-slate-200/50">
         <div>
           © {new Date().getFullYear()} Smart Hospital Management & Patient Care System. All rights reserved.
         </div>
         <div className="flex items-center gap-4">
           <Link to="/" className="hover:text-blue-600 transition-colors">Hospital Portal</Link>
           <Link to="/register" className="hover:text-blue-600 transition-colors">Staff Registration</Link>
-          <button onClick={() => setIsDemoModalOpen(true)} className="hover:text-blue-600 transition-colors">Demo Mode</button>
         </div>
       </footer>
-
-      {/* LIVE DEMO ROLE CHOOSER MODAL */}
-      {isDemoModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fadeIn">
-          <div className="bg-white rounded-3xl shadow-2xl border border-slate-100 max-w-lg w-full p-6 sm:p-7 relative">
-            {/* Modal Header */}
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-              <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center">
-                  <Play className="w-4 h-4 fill-emerald-600 text-emerald-600" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-bold text-slate-900">Live Demo Portal</h3>
-                  <p className="text-xs text-slate-500">Select an authorized role to explore the simulated system</p>
-                </div>
-              </div>
-              <button
-                onClick={() => setIsDemoModalOpen(false)}
-                className="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            {/* 4 Demo Roles Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 my-5">
-              {ROLES.map((r) => {
-                const isLaunching = launchingDemoRole === r.id;
-                return (
-                  <button
-                    key={r.id}
-                    disabled={launchingDemoRole !== null}
-                    onClick={() => handleStartDemo(r.id)}
-                    className="flex flex-col text-left p-3.5 rounded-2xl border border-slate-200 hover:border-emerald-500 hover:bg-emerald-50/40 transition-all group cursor-pointer disabled:opacity-50"
-                  >
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 group-hover:bg-emerald-100 group-hover:text-emerald-700 flex items-center justify-center transition-colors">
-                        {r.icon(false)}
-                      </div>
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-100/70 px-2 py-0.5 rounded-full">
-                        {r.badge}
-                      </span>
-                    </div>
-
-                    <div className="text-sm font-bold text-slate-900 group-hover:text-emerald-950">
-                      {r.name}
-                    </div>
-                    <div className="text-[11px] text-slate-500 line-clamp-2 mt-1">
-                      {r.description}
-                    </div>
-
-                    <div className="mt-3 pt-2 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-emerald-700">
-                      <span>{isLaunching ? 'Starting demo...' : 'Launch Demo'}</span>
-                      <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Modal Footer */}
-            <div className="pt-2 text-center text-xs text-slate-500 flex items-center justify-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-              <span>Safe sandbox environment with realistic sample records</span>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

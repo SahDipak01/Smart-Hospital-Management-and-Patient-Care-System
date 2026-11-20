@@ -90,6 +90,15 @@ const register = async (req, res, next) => {
       const count = await Patient.countDocuments();
       const uhid = `HMS-P-${new Date().getFullYear()}-${String(count + 1).padStart(4, '0')}`;
 
+      let formattedAllergies = [];
+      if (typeof allergies === 'string' && allergies.trim()) {
+        formattedAllergies = allergies.split(',').map((s) => ({ substance: s.trim(), severity: 'Moderate' }));
+      } else if (Array.isArray(allergies)) {
+        formattedAllergies = allergies.map((item) =>
+          typeof item === 'string' ? { substance: item, severity: 'Moderate' } : item
+        );
+      }
+
       const patient = await Patient.create({
         uhid,
         user: user._id,
@@ -102,7 +111,7 @@ const register = async (req, res, next) => {
         email: email.toLowerCase().trim(),
         address: address || {},
         emergencyContact: emergencyContact || {},
-        allergies: allergies || [],
+        allergies: formattedAllergies,
       });
 
       user.profileRef = patient._id;
@@ -320,19 +329,19 @@ const login = async (req, res, next) => {
 
     // 1. Check Approval Status for Doctors and Staff Personnel
     if (user.role !== 'admin' && user.role !== 'patient') {
-      if (user.approvalStatus === 'Pending' || !user.isApproved) {
-        return res.status(403).json({
-          success: false,
-          accountStatus: 'Pending',
-          message: 'Your account registration is currently awaiting administrator verification. Please contact hospital administration once your credentials have been verified.',
-        });
-      }
-
       if (user.approvalStatus === 'Rejected') {
         return res.status(403).json({
           success: false,
           accountStatus: 'Rejected',
           message: `Your registration request was rejected by the administrator. Reason: ${user.rejectionReason || 'Verification criteria not met.'}`,
+        });
+      }
+
+      if (user.approvalStatus === 'Pending' || !user.isApproved) {
+        return res.status(403).json({
+          success: false,
+          accountStatus: 'Pending',
+          message: 'Your account registration is currently awaiting administrator verification. Please contact hospital administration once your credentials have been verified.',
         });
       }
     }

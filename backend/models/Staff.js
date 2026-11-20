@@ -26,7 +26,7 @@ const staffSchema = new mongoose.Schema(
     },
     roleType: {
       type: String,
-      enum: ['nurse', 'lab_technician', 'pharmacist', 'receptionist', 'admin_staff', 'billing_staff'],
+      enum: ['nurse', 'lab_technician', 'pharmacist', 'receptionist', 'admin_staff', 'billing_staff', 'staff'],
       required: true,
     },
     department: {

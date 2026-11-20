@@ -19,7 +19,7 @@
 const http = require('http');
 const mongoose = require('mongoose');
 const { MongoMemoryServer } = require('mongodb-memory-server');
-const app = require('./server');
+const { app } = require('./server');
 const User = require('./models/User');
 const Doctor = require('./models/Doctor');
 const Staff = require('./models/Staff');
