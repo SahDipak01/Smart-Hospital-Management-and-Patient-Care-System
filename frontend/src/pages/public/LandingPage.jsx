@@ -19,7 +19,9 @@ import {
   Sparkles,
   ChevronRight,
   Zap,
+  TrendingUp,
 } from 'lucide-react';
+import { HospitalLogo } from '../../components/common/HospitalLogo';
 
 const STAFF_ROLES = ['staff', 'nurse', 'receptionist', 'pharmacist', 'lab_technician', 'billing_staff'];
 
@@ -96,22 +98,19 @@ const LandingPage = () => {
       <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
           {/* Logo brand */}
-          <Link to="/" className="flex items-center gap-3 group">
-            <div className="h-11 w-11 rounded-xl bg-medical-600 flex items-center justify-center text-white shadow-md shadow-medical-600/25 group-hover:bg-medical-700 transition-colors">
-              <Activity className="h-6 w-6 stroke-[2.5]" />
-            </div>
-            <div>
-              <div className="flex items-center gap-1.5">
-                <span className="text-xl font-extrabold text-slate-900 tracking-tight">SmartCare</span>
-                <span className="text-xs font-bold uppercase tracking-wider text-medical-600 bg-medical-50 px-1.5 py-0.5 rounded border border-medical-100">
-                  HMS
-                </span>
-              </div>
-              <p className="text-[10px] uppercase font-bold tracking-widest text-slate-400">
-                Hospital Clinical & Operations Platform
-              </p>
-            </div>
+          <Link to="/" className="hover:opacity-95 transition-opacity">
+            <HospitalLogo iconSize="w-10 h-10 sm:w-11 sm:h-11" />
           </Link>
+
+          {/* Slogan with Heartbeat Graphic */}
+          <div className="hidden lg:flex items-center gap-2 text-right">
+            <span className="text-xs sm:text-sm font-semibold italic text-[#0066cc]">
+              Better Care. Healthier Tomorrow.
+            </span>
+            <svg className="w-10 h-5 text-[#0066cc]" viewBox="0 0 60 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M0 12h18l3-6 5 14 4-11 3 5 4-2h23" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </div>
 
           {/* Right Navigation Controls */}
           <div className="flex items-center gap-4 sm:gap-6">
@@ -181,20 +180,48 @@ const LandingPage = () => {
           </div>
 
           {/* Hero Headline in Main Project Typography & Color */}
-          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold text-slate-900 tracking-tight leading-[1.12]">
-            Scientific Healthcare for <br className="hidden sm:inline" />
-            <span className="text-medical-600 underline decoration-medical-300 decoration-wavy decoration-2">
-              Healthier Patients
-            </span>{' '}
-            and Higher Hospital Efficiency
+          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold text-[#0f2851] tracking-tight leading-[1.12]">
+            Advanced Healthcare <br className="hidden sm:inline" />
+            <span className="text-[#1565c0]">
+              Management for a Healthier Society
+            </span>
           </h1>
 
           {/* Subtitle description */}
           <p className="max-w-3xl mx-auto text-base sm:text-lg lg:text-xl text-slate-600 leading-relaxed font-normal">
-            A centralized hospital operating system empowering clinicians, nursing teams, diagnostic laboratories,
-            pharmacies, billing specialists, and patients with integrated EHRs, real-time bed management, computerized
-            invoicing, and automated symptom triage.
+            Comprehensive hospital management solution for patients, doctors and healthcare staff.
           </p>
+
+          {/* 4 Feature Badges (Horizontal Row matching design) */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-2xl mx-auto pt-2">
+            <div className="bg-white border border-slate-200/80 rounded-2xl p-3 flex flex-col items-center text-center shadow-xs">
+              <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center mb-1.5">
+                <ShieldCheck className="w-5 h-5 stroke-[2.2]" />
+              </div>
+              <span className="text-xs font-bold text-slate-800 leading-tight">Secure & Reliable</span>
+            </div>
+
+            <div className="bg-white border border-slate-200/80 rounded-2xl p-3 flex flex-col items-center text-center shadow-xs">
+              <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center mb-1.5">
+                <Activity className="w-5 h-5 stroke-[2.2]" />
+              </div>
+              <span className="text-xs font-bold text-slate-800 leading-tight">Smart Management</span>
+            </div>
+
+            <div className="bg-white border border-slate-200/80 rounded-2xl p-3 flex flex-col items-center text-center shadow-xs">
+              <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center mb-1.5">
+                <TrendingUp className="w-5 h-5 stroke-[2.2]" />
+              </div>
+              <span className="text-xs font-bold text-slate-800 leading-tight">Better Care</span>
+            </div>
+
+            <div className="bg-white border border-slate-200/80 rounded-2xl p-3 flex flex-col items-center text-center shadow-xs">
+              <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center mb-1.5">
+                <Users className="w-5 h-5 stroke-[2.2]" />
+              </div>
+              <span className="text-xs font-bold text-slate-800 leading-tight">Healthier Community</span>
+            </div>
+          </div>
 
           {/* Two Hero Action CTA Buttons */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 sm:gap-4 pt-3">
@@ -206,13 +233,13 @@ const LandingPage = () => {
               <ArrowRight className="w-4 h-4 stroke-[2.5]" />
             </Link>
 
-            <button
-              onClick={scrollToDemo}
+            <Link
+              to="/login"
               className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-full text-base font-bold text-slate-800 bg-white hover:bg-slate-50 border border-slate-300/80 shadow-sm hover:shadow transition-all"
             >
               <Zap className="w-4 h-4 text-medical-500 fill-medical-500" />
               <span>Explore Portal (Demo Sign-in)</span>
-            </button>
+            </Link>
           </div>
 
           {/* Verification Highlights Strip */}
