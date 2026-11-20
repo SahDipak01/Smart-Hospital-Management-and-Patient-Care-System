@@ -278,29 +278,29 @@ const BillingPage = () => {
                       {b.billNumber}
                     </td>
                     <td className="py-3 px-4 text-slate-600">
-                      {new Date(b.billDate).toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' })}
+                      {new Date(b.billDate || b.createdAt || Date.now()).toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' })}
                     </td>
                     <td className="py-3 px-4">
                       <div className="font-semibold text-slate-900">
-                        {b.patient?.firstName} {b.patient?.lastName}
+                        {b.patient?.firstName ? `${b.patient.firstName} ${b.patient.lastName || ''}`.trim() : (b.patient?.name || 'Walk-in Patient')}
                       </div>
-                      <div className="text-[10px] text-slate-400 font-mono">{b.patient?.uhid}</div>
+                      <div className="text-[10px] text-slate-400 font-mono">{b.patient?.uhid || 'N/A'}</div>
                     </td>
                     <td className="py-3 px-4 font-bold text-slate-900">
-                      ${b.totalAmount.toFixed(2)}
+                      ${Number(b.totalAmount || 0).toFixed(2)}
                     </td>
                     <td className="py-3 px-4 font-bold text-emerald-600">
-                      ${b.paidAmount.toFixed(2)}
+                      ${Number(b.paidAmount || 0).toFixed(2)}
                     </td>
                     <td className="py-3 px-4 font-bold text-amber-700">
-                      ${b.balanceAmount.toFixed(2)}
+                      ${Number(b.balanceAmount ?? Math.max(0, (b.totalAmount || 0) - (b.paidAmount || 0))).toFixed(2)}
                     </td>
                     <td className="py-3 px-4">
-                      <Badge>{b.paymentStatus}</Badge>
+                      <Badge>{b.paymentStatus || b.status || 'Pending'}</Badge>
                     </td>
                     <td className="py-3 px-4 text-right">
                       <div className="flex items-center justify-end gap-1.5">
-                        {b.balanceAmount > 0 && (
+                        {Number(b.balanceAmount ?? Math.max(0, (b.totalAmount || 0) - (b.paidAmount || 0))) > 0 && (
                           <button
                             onClick={() => openPaymentModal(b)}
                             className="px-2.5 py-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 rounded text-xs font-semibold border border-emerald-200"

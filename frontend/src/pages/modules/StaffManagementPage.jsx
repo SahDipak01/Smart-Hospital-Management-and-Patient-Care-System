@@ -42,8 +42,8 @@ const StaffManagementPage = () => {
         api.get('/departments'),
       ]);
 
-      if (stfRes.data.success) setStaffList(stfRes.data.staff);
-      if (deptRes.data.success) setDepartments(deptRes.data.departments);
+      if (stfRes.data.success) setStaffList(stfRes.data.staff || []);
+      if (deptRes.data.success) setDepartments(deptRes.data.departments || []);
     } catch (err) {
       console.error(err);
     } finally {
@@ -142,14 +142,16 @@ const StaffManagementPage = () => {
                   <tr key={stf._id} className="hover:bg-slate-50/80 transition-colors">
                     <td className="py-3 px-4 font-mono font-bold text-slate-800">{stf.staffId}</td>
                     <td className="py-3 px-4">
-                      <div className="font-semibold text-slate-900">{stf.firstName} {stf.lastName}</div>
-                      <div className="text-[10px] text-slate-400">{stf.user?.email}</div>
+                      <div className="font-semibold text-slate-900">
+                        {stf.name || `${stf.firstName || ''} ${stf.lastName || ''}`.trim() || 'Staff Member'}
+                      </div>
+                      <div className="text-[10px] text-slate-400">{stf.user?.email || stf.email}</div>
                     </td>
                     <td className="py-3 px-4 capitalize font-medium text-slate-700">
-                      {stf.roleType.replace('_', ' ')}
+                      {(stf.roleType || stf.role || 'Staff').replace('_', ' ')}
                     </td>
                     <td className="py-3 px-4 text-slate-600">
-                      {stf.department?.name || 'General Operations'}
+                      {stf.department?.name || stf.department || 'General Operations'}
                     </td>
                     <td className="py-3 px-4 font-mono text-slate-600">{stf.phone}</td>
                     <td className="py-3 px-4">

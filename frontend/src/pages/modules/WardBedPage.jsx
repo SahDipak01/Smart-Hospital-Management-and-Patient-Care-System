@@ -146,14 +146,14 @@ const WardBedPage = () => {
   const allAvailableBeds = matrix.flatMap((m) =>
     (m.beds || [])
       .filter((b) => b.status === 'Available')
-      .map((b) => ({ ...b, wardName: m.ward.name, wardCode: m.ward.code }))
+      .map((b) => ({ ...b, wardName: m.ward?.name || m.ward, wardCode: m.ward?.code || 'WARD' }))
   );
 
   // Find available beds for selected ward
   const availableBedsForWard = admitWardId
-    ? matrix
-        .find((m) => m.ward.id === admitWardId)
-        ?.beds.filter((b) => b.status === 'Available') || []
+    ? (matrix
+        .find((m) => (m.ward?.id || m.ward?._id) === admitWardId)
+        ?.beds || []).filter((b) => b.status === 'Available')
     : [];
 
   return (
@@ -201,28 +201,32 @@ const WardBedPage = () => {
       ) : (
         <div className="space-y-6">
           {matrix.map(({ ward, beds }) => {
-            const occupiedCount = beds.filter((b) => b.status === 'Occupied').length;
-            const occupancyRate = beds.length > 0 ? Math.round((occupiedCount / beds.length) * 100) : 0;
+            const wardId = ward?.id || ward?._id || Math.random().toString();
+            const wardName = ward?.name || String(ward || 'Hospital Ward');
+            const wardCode = ward?.code || 'WARD';
+            const bedsList = Array.isArray(beds) ? beds : [];
+            const occupiedCount = bedsList.filter((b) => b.status === 'Occupied').length;
+            const occupancyRate = bedsList.length > 0 ? Math.round((occupiedCount / bedsList.length) * 100) : 0;
 
             return (
-              <div key={ward.id} className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm space-y-4">
+              <div key={wardId} className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm space-y-4">
                 {/* Ward Header */}
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-slate-100 pb-3">
                   <div>
                     <div className="flex items-center gap-2">
-                      <h3 className="text-sm font-bold text-slate-900">{ward.name}</h3>
+                      <h3 className="text-sm font-bold text-slate-900">{wardName}</h3>
                       <span className="text-[10px] font-mono font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
-                        {ward.code}
+                        {wardCode}
                       </span>
                     </div>
                     <p className="text-xs text-slate-500 mt-0.5">
-                      {ward.floor} • Type: {ward.type} • Daily Rate: ${ward.dailyRate}/day
+                      {ward?.floor || 'Floor 1'} • Type: {ward?.type || 'General'} • Daily Rate: ${ward?.dailyRate || 350}/day
                     </p>
                   </div>
 
                   <div className="flex items-center gap-3 text-xs">
                     <span className="text-slate-500 font-medium">
-                      {occupiedCount} / {beds.length} Beds Occupied ({occupancyRate}%)
+                      {occupiedCount} / {bedsList.length} Beds Occupied ({occupancyRate}%)
                     </span>
                     <div className="w-24 bg-slate-100 h-2 rounded-full overflow-hidden">
                       <div
@@ -235,7 +239,7 @@ const WardBedPage = () => {
 
                 {/* Beds Cards Grid */}
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
-                  {beds.map((b) => {
+                  {bedsList.map((b) => {
                     const isOccupied = b.status === 'Occupied';
                     const isAvailable = b.status === 'Available';
                     const admission = b.currentAdmission;

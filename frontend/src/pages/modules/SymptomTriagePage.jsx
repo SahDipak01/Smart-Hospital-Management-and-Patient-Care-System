@@ -204,7 +204,7 @@ const SymptomTriagePage = () => {
             <button
               onClick={() => {
                 setAssessmentResult(null);
-                setChiefComplaints('');
+                setChiefComplaint('');
                 setSelectedSymptoms([]);
               }}
               className="text-xs font-semibold text-slate-500 hover:text-slate-800 underline"

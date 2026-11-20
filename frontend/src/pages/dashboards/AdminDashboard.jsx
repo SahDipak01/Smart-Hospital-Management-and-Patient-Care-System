@@ -484,22 +484,30 @@ const AdminDashboard = () => {
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">
                       <span className="text-xs font-semibold text-slate-800">{act.action}</span>
-                      <Badge size="sm">{act.entity}</Badge>
-                      {act.userRole && (
+                      <Badge size="sm">{act.entity || 'System'}</Badge>
+                      {(act.userRole || act.actor?.role) && (
                         <span className="text-[10px] font-mono text-slate-400 uppercase">
-                          [{act.userRole}]
+                          [{act.userRole || act.actor?.role}]
                         </span>
                       )}
                     </div>
                     <p className="text-[11px] text-slate-500 mt-0.5 truncate">
-                      By <span className="font-medium text-slate-700">{act.userEmail}</span> • Action Target: {act.entityId || 'N/A'}
+                      By <span className="font-medium text-slate-700">{act.userEmail || act.actor?.name || 'admin@hospital.com'}</span> • Action Target: {act.entityId || act.details || 'N/A'}
                     </p>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-1 text-[11px] text-slate-400 flex-shrink-0">
                   <Clock className="w-3 h-3" />
-                  <span>{new Date(act.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                  <span>
+                    {(() => {
+                      const raw = act.createdAt || act.timestamp;
+                      const d = raw ? new Date(raw) : new Date();
+                      return !isNaN(d.getTime())
+                        ? d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                        : 'Just now';
+                    })()}
+                  </span>
                 </div>
               </div>
             ))

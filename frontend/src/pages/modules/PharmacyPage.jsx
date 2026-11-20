@@ -62,7 +62,7 @@ const PharmacyPage = () => {
 
       const res = await api.get(`/pharmacy/inventory?${params.toString()}`);
       if (res.data.success) {
-        setMedicines(res.data.medicines);
+        setMedicines(res.data.medicines || res.data.inventory || []);
         setAlerts(res.data.alerts || {});
       }
     } catch (err) {
@@ -317,8 +317,12 @@ const PharmacyPage = () => {
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {medicines.map((m) => {
-                  const isLow = m.stockQuantity <= m.reorderLevel;
-                  const isExpiring = new Date(m.expiryDate) < new Date(Date.now() + 90 * 24 * 60 * 60 * 1000);
+                  const stock = m.stockQuantity ?? m.stock ?? 0;
+                  const price = Number(m.unitPrice ?? m.price ?? 0);
+                  const reorder = m.reorderLevel ?? 50;
+                  const isLow = stock <= reorder;
+                  const itemCode = m.itemCode || m.batchNumber || `MED-${m._id?.slice(-4) || '101'}`;
+                  const isExpiring = m.expiryDate ? new Date(m.expiryDate) < new Date(Date.now() + 90 * 24 * 60 * 60 * 1000) : false;
                   return (
                     <tr
                       key={m._id}
@@ -327,18 +331,18 @@ const PharmacyPage = () => {
                       }`}
                     >
                       <td className="py-3 px-4 font-mono font-bold text-slate-700">
-                        {m.itemCode}
+                        {itemCode}
                       </td>
                       <td className="py-3 px-4">
                         <div className="font-bold text-slate-900">{m.name}</div>
-                        <div className="text-[10px] text-slate-400">{m.genericName} ({m.strength})</div>
+                        <div className="text-[10px] text-slate-400">{m.genericName || m.name} ({m.strength || 'Standard'})</div>
                       </td>
                       <td className="py-3 px-4">
                         <span className="font-semibold text-slate-800">{m.category}</span>
-                        <span className="block text-[10px] text-slate-400">{m.dosageForm}</span>
+                        <span className="block text-[10px] text-slate-400">{m.dosageForm || 'Tablet/Vial'}</span>
                       </td>
                       <td className="py-3 px-4 font-bold text-emerald-600">
-                        ${m.unitPrice.toFixed(2)}
+                        ${price.toFixed(2)}
                       </td>
                       <td className="py-3 px-4">
                         <span
@@ -346,11 +350,11 @@ const PharmacyPage = () => {
                             isLow ? 'text-rose-600' : 'text-slate-900'
                           }`}
                         >
-                          {m.stockQuantity} units
+                          {stock} units
                         </span>
                         {isLow && (
                           <span className="block text-[10px] text-rose-500 font-semibold uppercase">
-                            Low Stock (Reorder: {m.reorderLevel})
+                            Low Stock (Reorder: {reorder})
                           </span>
                         )}
                       </td>

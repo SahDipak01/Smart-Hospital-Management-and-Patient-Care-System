@@ -61,7 +61,7 @@ const ApprovalsPage = () => {
         api.get('/departments'),
       ]);
 
-      if (reqRes.data.success) setRequests(reqRes.data.requests);
+      if (reqRes.data.success) setRequests(reqRes.data.requests || reqRes.data.applicants || []);
       if (statsRes.data.success) setStats(statsRes.data.stats);
       if (deptRes.data.success) setDepartments(deptRes.data.departments || []);
     } catch (err) {

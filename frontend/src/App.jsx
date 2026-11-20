@@ -4,7 +4,8 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import DashboardLayout from './layouts/DashboardLayout';
 import LoadingSpinner from './components/common/LoadingSpinner';
 
-// Auth Pages
+// Auth & Public Pages
+import LandingPage from './pages/public/LandingPage';
 import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
 import ForgotPassword from './pages/auth/ForgotPassword';
@@ -87,14 +88,12 @@ function App() {
     <AuthProvider>
       <HashRouter>
         <Routes>
-          {/* Public Authentication Routes */}
+          {/* Public Landing & Authentication Routes */}
+          <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password/:token" element={<ResetPassword />} />
-
-          {/* Root Redirect */}
-          <Route path="/" element={<RootRedirect />} />
 
           {/* Administrator Scope */}
           <Route

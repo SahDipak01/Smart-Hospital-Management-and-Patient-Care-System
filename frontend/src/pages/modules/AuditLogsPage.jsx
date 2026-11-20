@@ -149,27 +149,31 @@ const AuditLogsPage = () => {
                 {logs.map((log) => (
                   <tr key={log._id} className="hover:bg-slate-50/80 transition-colors">
                     <td className="py-3 px-4 text-slate-500 font-mono text-[11px]">
-                      {new Date(log.createdAt).toLocaleString()}
+                      {(() => {
+                        const raw = log.createdAt || log.timestamp;
+                        const d = raw ? new Date(raw) : new Date();
+                        return !isNaN(d.getTime()) ? d.toLocaleString() : 'Recent';
+                      })()}
                     </td>
                     <td className="py-3 px-4 font-bold text-slate-800">
                       {log.action}
                     </td>
                     <td className="py-3 px-4">
                       <span className="font-semibold text-slate-700 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
-                        {log.entity}
+                        {log.entity || 'System'}
                       </span>
                     </td>
                     <td className="py-3 px-4 font-mono text-slate-500 text-[11px]">
                       {log.entityId || 'N/A'}
                     </td>
                     <td className="py-3 px-4 font-medium text-slate-800">
-                      {log.userEmail}
+                      {log.userEmail || log.actor?.name || 'admin@hospital.com'}
                     </td>
                     <td className="py-3 px-4">
-                      <Badge size="sm">{log.userRole}</Badge>
+                      <Badge size="sm">{log.userRole || log.actor?.role || 'admin'}</Badge>
                     </td>
                     <td className="py-3 px-4 font-mono text-slate-400 text-[11px]">
-                      {log.ipAddress}
+                      {log.ipAddress || '127.0.0.1'}
                     </td>
                   </tr>
                 ))}
