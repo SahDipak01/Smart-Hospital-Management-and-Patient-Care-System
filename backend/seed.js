@@ -21,11 +21,49 @@ const Notification = require('./models/Notification');
 const AuditLog = require('./models/AuditLog');
 const HospitalSetting = require('./models/HospitalSetting');
 
+const ensureCoreAccounts = async () => {
+  try {
+    const coreAccounts = [
+      { email: 'admin@hospital.com', name: 'Dr. Arthur Vance (Chief Administrator)', role: 'admin', password: 'Admin@123' },
+      { email: 'dr.sarah@hospital.com', name: 'Dr. Sarah Jenkins', role: 'doctor', password: 'Doctor@123' },
+      { email: 'john.doe@email.com', name: 'John Doe', role: 'patient', password: 'Patient@123' },
+      { email: 'nurse.sarah@hospital.com', name: 'Nurse Sarah Connor', role: 'nurse', password: 'Nurse@123' },
+    ];
+
+    for (const acc of coreAccounts) {
+      let u = await User.findOne({ email: acc.email });
+      if (u) {
+        u.password = acc.password;
+        u.role = acc.role;
+        u.isActive = true;
+        u.isApproved = true;
+        u.approvalStatus = 'Approved';
+        await u.save();
+      } else {
+        await User.create({
+          name: acc.name,
+          email: acc.email,
+          password: acc.password,
+          role: acc.role,
+          phone: '+1 (555) 010-0000',
+          isActive: true,
+          isApproved: true,
+          approvalStatus: 'Approved',
+        });
+      }
+    }
+    console.log('[Seeder] Core 4 role accounts ensured with encrypted credentials.');
+  } catch (err) {
+    console.error('[Seeder] Error ensuring core accounts:', err.message);
+  }
+};
+
 const seedDatabaseIfEmpty = async () => {
   try {
     const existingUsers = await User.countDocuments();
     if (existingUsers > 0) {
-      console.log(`[Seeder] Database already populated with ${existingUsers} users. Skipping seeder.`);
+      console.log(`[Seeder] Database already populated with ${existingUsers} users. Verifying core credentials...`);
+      await ensureCoreAccounts();
       return;
     }
 
@@ -254,18 +292,20 @@ const seedDatabaseIfEmpty = async () => {
     }
 
     // Staff Accounts
+    const nursePassword = 'Nurse@123';
     const staffConfigs = [
-      { email: 'nurse.clara@hospital.com', firstName: 'Clara', lastName: 'Oswald', roleType: 'nurse', deptCode: 'EMER', shift: 'Morning' },
-      { email: 'pharmacist.alex@hospital.com', firstName: 'Alex', lastName: 'Mercer', roleType: 'pharmacist', deptCode: 'GENM', shift: 'Morning' },
-      { email: 'lab.robert@hospital.com', firstName: 'Robert', lastName: 'Langdon', roleType: 'lab_technician', deptCode: 'GENM', shift: 'Morning' },
+      { email: 'nurse.sarah@hospital.com', firstName: 'Sarah', lastName: 'Connor', roleType: 'nurse', deptCode: 'EMER', shift: 'Morning', password: nursePassword },
+      { email: 'nurse.clara@hospital.com', firstName: 'Clara', lastName: 'Oswald', roleType: 'nurse', deptCode: 'EMER', shift: 'Morning', password: nursePassword },
+      { email: 'pharmacist.alex@hospital.com', firstName: 'Alex', lastName: 'Mercer', roleType: 'pharmacist', deptCode: 'GENM', shift: 'Morning', password: staffPassword },
+      { email: 'lab.robert@hospital.com', firstName: 'Robert', lastName: 'Langdon', roleType: 'lab_technician', deptCode: 'GENM', shift: 'Morning', password: staffPassword },
     ];
 
     for (const s of staffConfigs) {
       const u = await User.create({
         name: `${s.firstName} ${s.lastName}`,
         email: s.email,
-        password: staffPassword,
-        role: 'staff',
+        password: s.password || staffPassword,
+        role: s.roleType === 'nurse' ? 'nurse' : 'staff',
         phone: '+1 (555) 888-000' + s.firstName.length,
         isApproved: true,
         approvalStatus: 'Approved',

@@ -37,10 +37,19 @@ const DEMO_ROLES = [
     role: 'doctor',
     title: 'Lead Doctor / Cardiologist',
     badge: 'OPD & Clinical EMR',
-    email: 'doctor.smith@hospital.com',
+    email: 'dr.sarah@hospital.com',
     icon: Stethoscope,
     description: 'OPD appointments, electronic medical records timeline, digital prescriptions, lab orders & diagnosis.',
     route: '/doctor/dashboard',
+  },
+  {
+    role: 'patient',
+    title: 'Registered Patient',
+    badge: 'Patient Health Portal',
+    email: 'john.doe@email.com',
+    icon: Users,
+    description: 'Personal health records (UHID: HMS-PAT-10001), appointment booking, diagnostic lab reports & invoices.',
+    route: '/patient/dashboard',
   },
   {
     role: 'nurse',
@@ -51,69 +60,23 @@ const DEMO_ROLES = [
     description: 'Real-time ward bed matrix, patient admissions, discharges, bed transfers, and vital signs monitoring.',
     route: '/staff/dashboard',
   },
-  {
-    role: 'patient',
-    title: 'Registered Patient',
-    badge: 'Patient Health Portal',
-    email: 'patient.doe@hospital.com',
-    icon: Users,
-    description: 'Personal health records (UHID: HMS-PAT-10001), appointment booking, diagnostic lab reports & invoices.',
-    route: '/patient/dashboard',
-  },
-  {
-    role: 'pharmacist',
-    title: 'Chief Pharmacist',
-    badge: 'Inventory & Dispensary',
-    email: 'pharmacist.john@hospital.com',
-    icon: Pill,
-    description: 'Drug inventory, batch & expiry tracking, reorder alert monitoring, and prescription-linked dispensing.',
-    route: '/staff/dashboard',
-  },
-  {
-    role: 'lab_technician',
-    title: 'Laboratory Technician',
-    badge: 'Diagnostics Pipeline',
-    email: 'lab.david@hospital.com',
-    icon: FlaskConical,
-    description: 'Diagnostic orders pipeline, specimen collection, specimen tracking, test results & reference values.',
-    route: '/staff/dashboard',
-  },
-  {
-    role: 'receptionist',
-    title: 'Front-Desk Receptionist',
-    badge: 'OPD Registration & Tokens',
-    email: 'receptionist.mary@hospital.com',
-    icon: UserCheck,
-    description: 'Patient check-ins, token queues, doctor availability rosters, and emergency walk-in registrations.',
-    route: '/staff/dashboard',
-  },
-  {
-    role: 'billing_staff',
-    title: 'Billing Specialist',
-    badge: 'Invoicing & Payments',
-    email: 'billing.lisa@hospital.com',
-    icon: CreditCard,
-    description: 'Itemized hospital invoicing, payment collections, cash/card receipt logging & discharge clearance.',
-    route: '/staff/dashboard',
-  },
 ];
 
 const LandingPage = () => {
   const navigate = useNavigate();
-  const { user, isAuthenticated, login, logout } = useAuth();
+  const { user, isAuthenticated, startDemo, logout } = useAuth();
   const [loggingInRole, setLoggingInRole] = useState(null);
 
   const handle1ClickDemo = async (roleObj) => {
     setLoggingInRole(roleObj.role);
     try {
-      const loggedUser = await login(roleObj.email, 'password123', true);
+      const loggedUser = await startDemo(roleObj.role);
       if (loggedUser.role === 'admin') navigate('/admin/dashboard');
       else if (loggedUser.role === 'doctor') navigate('/doctor/dashboard');
       else if (loggedUser.role === 'patient') navigate('/patient/dashboard');
-      else if (STAFF_ROLES.includes(loggedUser.role)) navigate('/staff/dashboard');
-      else navigate(roleObj.route);
+      else navigate('/staff/dashboard');
     } catch (err) {
-      console.error('Auto login error:', err);
+      console.error('Demo login error:', err);
       navigate('/login');
     } finally {
       setLoggingInRole(null);

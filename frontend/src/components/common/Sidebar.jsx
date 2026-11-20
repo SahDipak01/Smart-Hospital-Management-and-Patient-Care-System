@@ -67,8 +67,17 @@ const Sidebar = ({ isOpen, onClose }) => {
           { to: '/patient/triage', label: 'Symptom Checker', icon: HeartPulse },
           { to: '/patient/profile', label: 'Profile & Security', icon: User },
         ];
-      case 'staff':
       case 'nurse':
+        return [
+          { to: '/staff/dashboard', label: 'Nursing Station', icon: LayoutDashboard },
+          { to: '/staff/wards', label: 'Ward & Bed Matrix', icon: Bed },
+          { to: '/staff/patients', label: 'Inpatient & Patient List', icon: Users },
+          { to: '/staff/appointments', label: 'Clinical Queue & Tasks', icon: Calendar },
+          { to: '/staff/pharmacy', label: 'Medication Inventory', icon: Pill },
+          { to: '/staff/lab', label: 'Diagnostic Lab Orders', icon: FlaskConical },
+          { to: '/staff/profile', label: 'Profile & Security', icon: User },
+        ];
+      case 'staff':
       case 'receptionist':
       case 'pharmacist':
       case 'lab_technician':

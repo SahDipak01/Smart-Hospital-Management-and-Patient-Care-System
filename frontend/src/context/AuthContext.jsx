@@ -14,6 +14,7 @@ export const AuthProvider = ({ children }) => {
   });
   const [token, setToken] = useState(() => localStorage.getItem('hms_token'));
   const [loading, setLoading] = useState(true);
+  const [isDemoMode, setIsDemoMode] = useState(() => localStorage.getItem('hms_is_demo_mode') === 'true');
 
   useEffect(() => {
     const initAuth = async () => {
@@ -80,9 +81,30 @@ export const AuthProvider = ({ children }) => {
     } finally {
       setUser(null);
       setToken(null);
+      setIsDemoMode(false);
+      localStorage.removeItem('hms_is_demo_mode');
       localStorage.removeItem('hms_token');
       localStorage.removeItem('hms_user');
     }
+  };
+
+  const startDemo = async (targetRole) => {
+    const demoCredentials = {
+      admin: { email: 'admin@hospital.com', password: 'Admin@123' },
+      doctor: { email: 'dr.sarah@hospital.com', password: 'Doctor@123' },
+      patient: { email: 'john.doe@email.com', password: 'Patient@123' },
+      nurse: { email: 'nurse.sarah@hospital.com', password: 'Nurse@123' },
+    };
+
+    const creds = demoCredentials[targetRole] || demoCredentials.admin;
+    const loggedUser = await login(creds.email, creds.password, false);
+    setIsDemoMode(true);
+    localStorage.setItem('hms_is_demo_mode', 'true');
+    return loggedUser;
+  };
+
+  const exitDemo = async () => {
+    await logout();
   };
 
   return (
@@ -92,10 +114,13 @@ export const AuthProvider = ({ children }) => {
         token,
         role: user?.role || null,
         isAuthenticated: !!token && !!user,
+        isDemoMode,
         loading,
         login,
         register,
         logout,
+        startDemo,
+        exitDemo,
         setUser,
       }}
     >

@@ -9,6 +9,7 @@ export const initialMockState = {
       _id: 'usr_admin_1',
       name: 'Dr. Arthur Vance (Chief Administrator)',
       email: 'admin@hospital.com',
+      password: 'Admin@123',
       role: 'admin',
       phone: '+1 (555) 010-0001',
       isActive: true,
@@ -18,7 +19,8 @@ export const initialMockState = {
     {
       _id: 'usr_doc_1',
       name: 'Dr. Sarah Jenkins',
-      email: 'doctor.smith@hospital.com',
+      email: 'dr.sarah@hospital.com',
+      password: 'Doctor@123',
       role: 'doctor',
       phone: '+1 (555) 010-0002',
       isActive: true,
@@ -32,7 +34,8 @@ export const initialMockState = {
     {
       _id: 'usr_doc_alt',
       name: 'Dr. Sarah Jenkins',
-      email: 'dr.sarah@hospital.com',
+      email: 'doctor.smith@hospital.com',
+      password: 'Doctor@123',
       role: 'doctor',
       phone: '+1 (555) 010-0002',
       isActive: true,
@@ -46,7 +49,23 @@ export const initialMockState = {
     {
       _id: 'usr_pat_1',
       name: 'John Doe',
+      email: 'john.doe@email.com',
+      password: 'Patient@123',
+      role: 'patient',
+      phone: '+1 (555) 010-0003',
+      isActive: true,
+      isApproved: true,
+      approvalStatus: 'Approved',
+      uhid: 'HMS-PAT-10001',
+      bloodGroup: 'O+',
+      gender: 'Male',
+      age: 42,
+    },
+    {
+      _id: 'usr_pat_alt',
+      name: 'John Doe',
       email: 'patient.doe@hospital.com',
+      password: 'Patient@123',
       role: 'patient',
       phone: '+1 (555) 010-0003',
       isActive: true,
@@ -61,6 +80,7 @@ export const initialMockState = {
       _id: 'usr_nurse_1',
       name: 'Nurse Sarah Connor',
       email: 'nurse.sarah@hospital.com',
+      password: 'Nurse@123',
       role: 'nurse',
       phone: '+1 (555) 010-0004',
       isActive: true,
@@ -896,6 +916,19 @@ export const getMockStore = () => {
     const saved = localStorage.getItem(`${STORAGE_KEY_PREFIX}store`);
     if (saved) {
       const parsed = JSON.parse(saved);
+      // Ensure the 4 primary accounts exist with their exact passwords
+      if (parsed.users) {
+        initialMockState.users.forEach((primaryUser) => {
+          const matchIdx = parsed.users.findIndex((u) => u.email.toLowerCase() === primaryUser.email.toLowerCase());
+          if (matchIdx >= 0) {
+            parsed.users[matchIdx] = { ...parsed.users[matchIdx], ...primaryUser };
+          } else {
+            parsed.users.push(primaryUser);
+          }
+        });
+      } else {
+        parsed.users = initialMockState.users;
+      }
       // Ensure wards have proper bed arrays
       if (!parsed.wards || !parsed.wards[0]?.beds) {
         parsed.wards = initialMockState.wards;
